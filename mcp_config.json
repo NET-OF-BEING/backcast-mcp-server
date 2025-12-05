@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "backcast": {
+      "command": "python3",
+      "args": [
+        "/home/panda/Documents/PythonScripts/OutcomeBackcasting/mcp_server.py"
+      ],
+      "env": {}
+    }
+  }
+}
