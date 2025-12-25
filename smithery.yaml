@@ -1,7 +1,7 @@
 # Smithery Configuration for Outcome Backcasting Engine
 # https://smithery.ai
 
-name: outcome-backcasting-engine
+name: backcast-mcp-server
 version: "1.0.0"
 description: |
   Strategic planning MCP server that reverse-engineers paths from desired
@@ -93,7 +93,7 @@ keywords:
 # Repository information
 repository:
   type: git
-  url: https://github.com/NET-OF-BEING/outcome-backcasting-engine
+  url: https://github.com/NET-OF-BEING/backcast-mcp-server
 
 # License
 license: MIT

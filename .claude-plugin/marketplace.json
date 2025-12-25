@@ -18,8 +18,8 @@
         "name": "NET-OF-BEING",
         "url": "https://github.com/NET-OF-BEING"
       },
-      "homepage": "https://github.com/NET-OF-BEING/outcome-backcasting-engine",
-      "repository": "https://github.com/NET-OF-BEING/outcome-backcasting-engine",
+      "homepage": "https://github.com/NET-OF-BEING/backcast-mcp-server",
+      "repository": "https://github.com/NET-OF-BEING/backcast-mcp-server",
       "license": "MIT",
       "keywords": ["planning", "backcasting", "strategy", "goals", "project-management", "ai"],
       "category": "productivity",
