@@ -5,9 +5,10 @@ HTTP Server for Outcome Backcasting Engine
 Exposes backcasting functionality via HTTP REST API for mobile/web access.
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import json
+import os
 from backcast_engine import (
     BackcastEngine, BackcastAnalyzer,
     Outcome, Step, Resource, Risk,
@@ -331,7 +332,7 @@ def export_pdf():
     if not current_plan:
         return jsonify({'status': 'error', 'message': 'No plan loaded'}), 400
 
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     filename = data.get('filename')
 
     try:
@@ -352,7 +353,7 @@ def export_ical():
     if not current_plan:
         return jsonify({'status': 'error', 'message': 'No plan loaded'}), 400
 
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     filename = data.get('filename')
 
     try:
@@ -373,7 +374,7 @@ def export_html():
     if not current_plan:
         return jsonify({'status': 'error', 'message': 'No plan loaded'}), 400
 
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     filename = data.get('filename')
 
     try:

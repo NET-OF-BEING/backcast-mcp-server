@@ -21,6 +21,11 @@ ENV/
 data/*.json
 !data/example_*.json
 
+# Export files
+data/*.pdf
+data/*.ics
+data/*.html
+
 # Large video files
 *.mkv
 *.mp4
