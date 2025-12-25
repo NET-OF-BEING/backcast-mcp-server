@@ -1,0 +1,99 @@
+# Smithery Configuration for Outcome Backcasting Engine
+# https://smithery.ai
+
+name: outcome-backcasting-engine
+version: "1.0.0"
+description: |
+  Strategic planning MCP server that reverse-engineers paths from desired
+  future outcomes to present actions. Define your goal, work backwards to
+  identify steps, manage dependencies, track progress, and analyze risks.
+
+author:
+  name: Derek M D Chan
+  github: NET-OF-BEING
+
+# Server configuration
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      plans_directory:
+        type: string
+        description: Directory to store plan JSON files
+        default: "./data"
+    required: []
+
+# Runtime configuration
+runtime: python
+pythonVersion: "3.10"
+entrypoint: mcp_server.py
+
+# Dependencies
+dependencies:
+  - dataclasses
+  - json
+  - pathlib
+  - datetime
+  - typing
+
+# Tools provided by this MCP server
+tools:
+  - name: create_plan
+    description: Create a new outcome backcasting plan with goals and success criteria
+
+  - name: add_step
+    description: Add a step to the current plan (milestone, action, decision, dependency, or risk mitigation)
+
+  - name: update_step_status
+    description: Update a step's status (not_started, in_progress, completed, blocked, skipped)
+
+  - name: get_plan_overview
+    description: Get overview of current plan with progress metrics and outcome details
+
+  - name: get_next_actions
+    description: Get actionable steps that are ready to work on (all dependencies met)
+
+  - name: save_plan
+    description: Save current plan to a JSON file
+
+  - name: load_plan
+    description: Load a previously saved plan from file
+
+  - name: list_plans
+    description: List all saved plans in the data directory
+
+  - name: get_critical_path
+    description: Get the critical path (longest dependency chain) identifying bottlenecks
+
+  - name: analyze_plan
+    description: Get comprehensive analysis including progress, risks, resources, and optimization suggestions
+
+  - name: export_markdown
+    description: Export current plan to Markdown format for sharing or documentation
+
+# Categories for discovery
+categories:
+  - productivity
+  - planning
+  - project-management
+  - strategic-planning
+
+# Keywords for search
+keywords:
+  - backcasting
+  - planning
+  - strategic
+  - goals
+  - dependencies
+  - project management
+  - reverse planning
+  - outcome-first
+
+# Repository information
+repository:
+  type: git
+  url: https://github.com/NET-OF-BEING/outcome-backcasting-engine
+
+# License
+license: MIT

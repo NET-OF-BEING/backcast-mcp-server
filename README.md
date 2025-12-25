@@ -2,6 +2,18 @@
 
 **Reverse-engineer your path from desired futures to present actions**
 
+[![MCP Server](https://img.shields.io/badge/MCP-Server-blue)](https://modelcontextprotocol.io)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-green.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Author
+
+**Derek M D Chan** — Creator and maintainer
+
+*Co-developed with Claude (Anthropic)*
+
+---
+
 ## Overview
 
 The Outcome Backcasting Engine is a strategic planning tool that helps you work backwards from a desired future outcome to identify the specific steps, resources, and dependencies needed to achieve your goals. Unlike traditional forward planning, backcasting starts with your end goal and creates a reverse roadmap to get there.
@@ -521,10 +533,17 @@ This is a personal utility built for local use. If you want to extend it:
 
 ## License
 
-Personal use utility - feel free to adapt for your own needs.
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Author & Credits
+
+**Derek M D Chan** — Creator and maintainer
+- GitHub: [@NET-OF-BEING](https://github.com/NET-OF-BEING)
+
+*Co-developed with Claude (Anthropic) using AI-assisted development*
 
 ---
 
-**Built with the Outcome Backcasting methodology from AI Plugin Concepts**
+**Built with the Outcome Backcasting methodology**
 
-For the philosophy behind this tool, see: `/home/panda/ai_plugin_concepts.md` (Concept #9)
+*Strategic planning tool that reverse-engineers paths from desired future outcomes to present actions.*
