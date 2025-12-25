@@ -1,0 +1,29 @@
+{
+  "name": "darkreachlabs-marketplace",
+  "owner": {
+    "name": "DarkReach Labs",
+    "email": "contact@darkreachlabs.com"
+  },
+  "metadata": {
+    "description": "Strategic planning and productivity tools by DarkReach Labs",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "outcome-backcasting",
+      "source": "./",
+      "description": "Strategic planning tool that reverse-engineers paths from desired future outcomes to present actions. Features AI-powered step generation, progress tracking, and exports to PDF/iCal/HTML.",
+      "version": "1.0.0",
+      "author": {
+        "name": "NET-OF-BEING",
+        "url": "https://github.com/NET-OF-BEING"
+      },
+      "homepage": "https://github.com/NET-OF-BEING/outcome-backcasting-engine",
+      "repository": "https://github.com/NET-OF-BEING/outcome-backcasting-engine",
+      "license": "MIT",
+      "keywords": ["planning", "backcasting", "strategy", "goals", "project-management", "ai"],
+      "category": "productivity",
+      "tags": ["planning", "strategy", "goals", "ai-powered"]
+    }
+  ]
+}
