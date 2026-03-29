@@ -848,165 +848,227 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             .mini-stats { flex-direction: row; }
         }
 
-        /* Buttons */
-        .btn {
-            padding: 8px 14px;
+        /* Action bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
             border-radius: var(--radius-sm);
-            border: none;
+            border: 1px solid var(--border);
+            background: var(--surface-1);
+            color: var(--text-secondary);
             cursor: pointer;
-            font-weight: 500;
             font-size: 13px;
-            transition: all var(--transition);
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 150ms;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             line-height: 1;
+        }
+        .action-btn:hover { background: var(--surface-2); color: var(--text-primary); border-color: var(--border-hover); }
+        .action-btn:active { transform: scale(0.97); }
+        .action-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .action-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+        .action-btn.primary:hover { background: var(--accent-light); }
+
+        .filter-pills {
+            display: flex;
+            gap: 2px;
+            margin-left: auto;
+            background: var(--surface-1);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            border: 1px solid var(--border);
+        }
+        .filter-pill {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms;
+        }
+        .filter-pill:hover { color: var(--text-secondary); }
+        .filter-pill.active { background: var(--surface-3); color: var(--text-primary); }
+
+        /* Step cards */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .step-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 150ms;
+            cursor: pointer;
+        }
+        .step-card:hover {
+            background: var(--surface-2);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .step-drag {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5px;
+            color: var(--text-muted);
+            cursor: grab;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 150ms;
+            padding: 4px 2px;
+        }
+        .step-card:hover .step-drag { opacity: 1; }
+        .drag-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .drag-row { display: flex; gap: 3px; }
+
+        .step-ring {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 150ms;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .step-ring:hover { border-color: var(--text-secondary); }
+        .step-ring.completed { border-color: var(--success); background: var(--success); color: white; }
+        .step-ring.in_progress { border-color: var(--accent); background: var(--accent-subtle); }
+        .step-ring.in_progress::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+        .step-ring.blocked { border-color: var(--error); background: rgba(248,113,113,0.1); color: var(--error); }
+
+        .step-body { flex: 1; min-width: 0; }
+        .step-card-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .step-card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .step-card.completed .step-card-title { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: var(--text-muted); }
+        .step-card.completed .step-card-desc { color: var(--text-muted); }
+
+        .step-priority {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        .step-priority.critical { background: rgba(248,113,113,0.1); color: var(--error); }
+        .step-priority.high { background: rgba(251,191,36,0.1); color: var(--warning); }
+        .step-priority.medium { background: rgba(124,92,252,0.1); color: var(--accent-light); }
+        .step-priority.low { background: rgba(136,136,160,0.1); color: var(--text-secondary); }
+
+        .step-hover-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 150ms;
+            flex-shrink: 0;
+        }
+        .step-card:hover .step-hover-actions { opacity: 1; }
+
+        .step-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 150ms;
             font-family: inherit;
         }
-        .btn:active { transform: scale(0.97); }
+        .step-action-btn:hover { background: var(--surface-3); color: var(--text-primary); }
+        .step-action-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        /* Export menu */
+        .export-menu {
+            position: fixed;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            z-index: 50;
+            display: none;
+        }
+        .export-menu.open { display: block; }
+        .export-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 150ms;
+        }
+        .export-menu button:hover { background: var(--surface-3); color: var(--text-primary); }
 
         .btn-primary {
             background: var(--accent);
             color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 2px 8px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-
-        .btn-secondary {
-            background: var(--surface-2);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        .btn-secondary:hover {
-            background: var(--surface-3);
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-        }
-
-        .btn-success {
-            background: rgba(52,211,153,0.15);
-            color: var(--success);
-            border: 1px solid rgba(52,211,153,0.25);
-        }
-        .btn-success:hover {
-            background: rgba(52,211,153,0.25);
-        }
-
-        .btn-accent {
-            background: rgba(139,92,246,0.15);
-            color: var(--accent);
-            border: 1px solid rgba(139,92,246,0.25);
-        }
-        .btn-accent:hover {
-            background: rgba(139,92,246,0.25);
-        }
-
-        .btn-error {
-            background: rgba(248,113,113,0.15);
-            color: var(--error);
-            border: 1px solid rgba(248,113,113,0.25);
-        }
-        .btn-error:hover {
-            background: rgba(248,113,113,0.25);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: #8a8a9f;
-            padding: 6px 10px;
-            font-size: 12px;
-        }
-        .btn-ghost:hover {
-            background: var(--surface-2);
-            color: var(--text-primary);
-        }
-
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 24px; }
-
-        /* Step cards */
-        .step-list {
-            max-height: 500px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
-        }
-
-        .step-item {
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            padding: 16px;
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--text-muted);
-            transition: all var(--transition);
-        }
-        .step-item:hover {
-            border-color: var(--border-hover);
-            border-left-color: inherit;
-            background: rgba(26,26,46,0.9);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .step-item.completed {
-            border-left-color: var(--success);
-        }
-        .step-item.completed .step-header,
-        .step-item.completed .step-desc {
-            opacity: 0.6;
-        }
-        .step-item.completed:hover .step-header,
-        .step-item.completed:hover .step-desc {
-            opacity: 0.8;
-        }
-        .step-item.in_progress { border-left-color: var(--accent); }
-        .step-item.blocked { border-left-color: var(--error); }
-
-        .step-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .step-title {
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
             font-weight: 500;
-            flex: 1;
-            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 150ms;
+            box-shadow: 0 2px 8px var(--accent-glow);
         }
-
-        .step-badge {
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            flex-shrink: 0;
-        }
-        .badge-critical { background: rgba(248,113,113,0.15); color: var(--error); }
-        .badge-high { background: rgba(251,191,36,0.15); color: var(--warning); }
-        .badge-medium { background: rgba(124,92,252,0.15); color: var(--accent-hover); }
-        .badge-low { background: rgba(107,107,128,0.15); color: var(--text-secondary); }
-
-        .step-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            line-height: 1.5;
-        }
-
-        .step-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 6px;
-        }
-        .step-actions button {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
+        .btn-primary:hover { background: var(--accent-light); }
 
         /* Modals */
         .modal {
@@ -1279,21 +1341,27 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                     </div>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="generateAISteps()">AI Generate Steps</button>
-                    <button class="btn btn-secondary" onclick="exportPDF()">PDF</button>
-                    <button class="btn btn-secondary" onclick="exportHTML()">HTML</button>
-                    <button class="btn btn-secondary" onclick="exportICal()">iCal</button>
-                    <button class="btn btn-success" onclick="showAddStepModal()">+ Add Step</button>
+                <div class="action-bar">
+                    <button class="action-btn primary" onclick="showAddStepModal()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        Add Step
+                    </button>
+                    <button class="action-btn" onclick="generateAISteps()">AI Generate</button>
+                    <button class="action-btn" onclick="showExportMenu(event)">Export &#9662;</button>
+                    <div class="filter-pills" role="tablist">
+                        <button class="filter-pill active" role="tab" aria-selected="true" onclick="setFilter('all', this)">All</button>
+                        <button class="filter-pill" role="tab" aria-selected="false" onclick="setFilter('not_started', this)">To Do</button>
+                        <button class="filter-pill" role="tab" aria-selected="false" onclick="setFilter('in_progress', this)">Active</button>
+                        <button class="filter-pill" role="tab" aria-selected="false" onclick="setFilter('completed', this)">Done</button>
+                        <button class="filter-pill" role="tab" aria-selected="false" onclick="setFilter('blocked', this)">Blocked</button>
+                    </div>
                 </div>
-
-                <div class="next-actions" id="nextActions" style="display:none;">
-                    <h3>Next Actions</h3>
-                    <ul id="nextActionsList"></ul>
-                </div>
-
-                <div class="section-label">Steps</div>
                 <div class="step-list" id="stepList"></div>
+                <div class="export-menu" id="exportMenu">
+                    <button onclick="exportPDF(); closeExportMenu()">PDF</button>
+                    <button onclick="exportHTML(); closeExportMenu()">HTML</button>
+                    <button onclick="exportICal(); closeExportMenu()">iCal</button>
+                </div>
             </div>
         </main>
     </div>
@@ -1442,35 +1510,13 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             document.getElementById('statBlockedCount').textContent = p.blocked;
             document.getElementById('statTimeline').textContent = overview.outcome.timeline || '\u2014';
 
-            // Next actions
-            if (nextActions.next_actions && nextActions.next_actions.length > 0) {
-                document.getElementById('nextActions').style.display = 'block';
-                document.getElementById('nextActionsList').innerHTML = nextActions.next_actions.slice(0,3).map(a =>
-                    `<li><strong>${a.title}</strong> <span style="color:var(--text-muted)">${a.priority}</span></li>`
-                ).join('');
-            } else {
-                document.getElementById('nextActions').style.display = 'none';
-            }
-
             // Steps
             const stepList = document.getElementById('stepList');
             if (steps.steps && steps.steps.length > 0) {
-                stepList.innerHTML = steps.steps.map(s => `
-                    <div class="step-item ${s.status}">
-                        <div class="step-header">
-                            <span class="step-title">#${s.id} ${s.title}</span>
-                            <span class="step-badge badge-${s.priority}">${s.priority}</span>
-                        </div>
-                        <div class="step-desc">${s.description || 'No description'}</div>
-                        <div class="step-actions">
-                            <button class="btn ${s.status === 'in_progress' ? 'btn-accent' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'in_progress')">Start</button>
-                            <button class="btn ${s.status === 'completed' ? 'btn-success' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'completed')">Done</button>
-                            <button class="btn ${s.status === 'blocked' ? 'btn-error' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'blocked')">Block</button>
-                        </div>
-                    </div>
-                `).join('');
+                window._allSteps = steps.steps;
+                renderSteps(steps.steps);
             } else {
-                stepList.innerHTML = '<div class="empty-state">No steps yet. Click "AI Generate Steps" to create some.</div>';
+                stepList.innerHTML = '<div class="empty-state"><p>No steps yet. Click "Add Step" or "AI Generate" to get started.</p></div>';
             }
         }
 
@@ -1483,6 +1529,81 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             toast('Status updated');
             refreshPlanView();
         }
+
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let expandedStepId = null;
+
+        function renderSteps(steps) {
+            const stepList = document.getElementById('stepList');
+            let filtered = steps;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(s => s.status === currentFilter);
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(s =>
+                    s.title.toLowerCase().includes(q) ||
+                    (s.description && s.description.toLowerCase().includes(q))
+                );
+            }
+
+            if (filtered.length === 0) {
+                stepList.innerHTML = '<div class="empty-state"><p>No matching steps</p></div>';
+                return;
+            }
+
+            stepList.innerHTML = filtered.map(s => {
+                const ringClass = s.status !== 'not_started' ? s.status : '';
+                const ringContent = s.status === 'completed' ? '&#10003;' : s.status === 'blocked' ? '!' : '';
+                return '<div class="step-card ' + s.status + '" data-step-id="' + s.id + '">' +
+                    '<div class="step-drag"><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div></div>' +
+                    '<div class="step-ring ' + ringClass + '" onclick="cycleStatus(' + s.id + ', \'' + s.status + '\', event)" title="Click to change status">' + ringContent + '</div>' +
+                    '<div class="step-body">' +
+                        '<div class="step-card-title">#' + s.id + ' ' + s.title + '</div>' +
+                        '<div class="step-card-desc">' + (s.description || 'No description') + '</div>' +
+                    '</div>' +
+                    '<span class="step-priority ' + s.priority + '">' + s.priority + '</span>' +
+                    '<div class="step-hover-actions">' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'in_progress\'); event.stopPropagation();" title="Start" aria-label="Start step ' + s.id + '">&#9654;</button>' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'completed\'); event.stopPropagation();" title="Done" aria-label="Complete step ' + s.id + '">&#10003;</button>' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'blocked\'); event.stopPropagation();" title="Block" aria-label="Block step ' + s.id + '">&#9888;</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function setFilter(filter, el) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); p.setAttribute('aria-selected', 'false'); });
+            el.classList.add('active');
+            el.setAttribute('aria-selected', 'true');
+            if (window._allSteps) renderSteps(window._allSteps);
+        }
+
+        function cycleStatus(stepId, current, event) {
+            event.stopPropagation();
+            var cycle = { not_started: 'in_progress', in_progress: 'completed', completed: 'not_started', blocked: 'in_progress' };
+            updateStatus(stepId, cycle[current] || 'in_progress');
+        }
+
+        function showExportMenu(e) {
+            var menu = document.getElementById('exportMenu');
+            var rect = e.target.getBoundingClientRect();
+            menu.style.top = (rect.bottom + 4) + 'px';
+            menu.style.left = rect.left + 'px';
+            menu.classList.toggle('open');
+            e.stopPropagation();
+        }
+        function closeExportMenu() { document.getElementById('exportMenu').classList.remove('open'); }
+        document.addEventListener('click', closeExportMenu);
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            if (window._allSteps) renderSteps(window._allSteps);
+        });
 
         function showCreateModal() { document.getElementById('createModal').classList.add('active'); }
         function showAddStepModal() { document.getElementById('addStepModal').classList.add('active'); }
