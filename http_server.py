@@ -1150,6 +1150,79 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
         .detail-section li::before { content: '\\2192  '; color: var(--accent); }
         .detail-empty { color: var(--text-muted); font-style: italic; font-size: 12px; }
 
+        .shortcuts-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .shortcuts-overlay.active { display: flex; }
+
+        .shortcuts-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+        }
+        .shortcuts-card h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+        .shortcut-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .shortcut-row:last-child { border-bottom: none; }
+        .shortcut-row kbd {
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--text-primary);
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .shortcut-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 150ms;
+            z-index: 10;
+        }
+        .shortcut-hint:hover { color: var(--text-secondary); border-color: var(--border-hover); }
+        .shortcut-hint kbd {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            font-size: 11px;
+            font-family: inherit;
+        }
+
         /* Modals */
         .modal {
             display: none;
@@ -1528,6 +1601,49 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             return res.json();
         }
 
+        function toggleSidebar() {
+            var layout = document.getElementById('appLayout');
+            var collapsed = layout.classList.toggle('collapsed');
+            localStorage.setItem('sidebar-collapsed', collapsed);
+            document.querySelector('.collapse-btn').textContent = collapsed ? '\u25B7' : '\u25C1';
+        }
+
+        // Restore sidebar state on load
+        (function() {
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                document.getElementById('appLayout').classList.add('collapsed');
+                var btn = document.querySelector('.collapse-btn');
+                if (btn) btn.textContent = '\u25B7';
+            }
+        })();
+
+        function toggleTheme() {
+            var html = document.documentElement;
+            var current = html.getAttribute('data-theme');
+            var next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            var icon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            } else {
+                icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+            }
+        }
+
+        // Restore theme on load
+        (function() {
+            var saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                updateThemeIcon('light');
+            }
+        })();
+
         function toast(msg, type = 'success') {
             const t = document.createElement('div');
             t.className = 'toast toast-' + type;
@@ -1606,6 +1722,22 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                 body: JSON.stringify({ status })
             });
             await api('/api/plan/save', { method: 'POST', body: JSON.stringify({ filename: currentPlan }) });
+
+            if (status === 'completed') {
+                var card = document.querySelector('[data-step-id="' + stepId + '"]');
+                if (card) {
+                    var rect = card.getBoundingClientRect();
+                    fireConfetti(rect.left + 30, rect.top + rect.height / 2, 25);
+                }
+                var overview = await api('/api/plan/overview');
+                if (overview.progress && overview.progress.percent === 100) {
+                    setTimeout(function() {
+                        fireConfetti(window.innerWidth / 2, window.innerHeight / 2, 120);
+                        toast('All steps complete!');
+                    }, 400);
+                }
+            }
+
             toast('Status updated');
             refreshPlanView();
         }
@@ -1850,9 +1982,140 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             } else { toast(res.message, 'error'); }
         }
 
+        var selectedStepIndex = -1;
+
+        function showShortcuts() { document.getElementById('shortcutsOverlay').classList.add('active'); }
+        function hideShortcuts() { document.getElementById('shortcutsOverlay').classList.remove('active'); }
+
+        document.addEventListener('keydown', function(e) {
+            var tag = document.activeElement.tagName;
+            var inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+            var modalOpen = document.querySelector('.modal.active') || document.querySelector('.shortcuts-overlay.active');
+
+            if (e.key === 'Escape') {
+                if (document.querySelector('.shortcuts-overlay.active')) { hideShortcuts(); return; }
+                if (document.querySelector('.modal.active')) { document.querySelectorAll('.modal.active').forEach(function(m) { m.classList.remove('active'); }); return; }
+                if (inInput) { document.activeElement.blur(); return; }
+                if (expandedStepId !== null) { expandedStepId = null; if (window._allSteps) renderSteps(window._allSteps); return; }
+                selectedStepIndex = -1;
+                highlightSelected();
+                return;
+            }
+
+            if (inInput || modalOpen) return;
+
+            switch(e.key) {
+                case 'n': showCreateModal(); e.preventDefault(); break;
+                case 's': showAddStepModal(); e.preventDefault(); break;
+                case '/': document.getElementById('searchInput').focus(); e.preventDefault(); break;
+                case '?': showShortcuts(); e.preventDefault(); break;
+                case 'j':
+                    if (window._allSteps && window._allSteps.length > 0) {
+                        selectedStepIndex = Math.min(selectedStepIndex + 1, window._allSteps.length - 1);
+                        highlightSelected();
+                    }
+                    e.preventDefault();
+                    break;
+                case 'k':
+                    if (window._allSteps) {
+                        selectedStepIndex = Math.max(selectedStepIndex - 1, 0);
+                        highlightSelected();
+                    }
+                    e.preventDefault();
+                    break;
+                case '1':
+                    if (selectedStepIndex >= 0 && window._allSteps[selectedStepIndex]) {
+                        updateStatus(window._allSteps[selectedStepIndex].id, 'in_progress');
+                    }
+                    break;
+                case '2':
+                    if (selectedStepIndex >= 0 && window._allSteps[selectedStepIndex]) {
+                        updateStatus(window._allSteps[selectedStepIndex].id, 'completed');
+                    }
+                    break;
+                case '3':
+                    if (selectedStepIndex >= 0 && window._allSteps[selectedStepIndex]) {
+                        updateStatus(window._allSteps[selectedStepIndex].id, 'blocked');
+                    }
+                    break;
+            }
+        });
+
+        function highlightSelected() {
+            document.querySelectorAll('.step-card').forEach(function(c, i) {
+                c.style.outline = i === selectedStepIndex ? '2px solid var(--accent)' : '';
+                c.style.outlineOffset = i === selectedStepIndex ? '2px' : '';
+                if (i === selectedStepIndex) c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
+        }
+
+        function fireConfetti(x, y, count) {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            var canvas = document.getElementById('confettiCanvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var ctx = canvas.getContext('2d');
+            var colors = ['#7c5cfc', '#9b7dff', '#34d399', '#fbbf24', '#f87171'];
+            var particles = [];
+
+            for (var i = 0; i < count; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.7) * 12,
+                    size: Math.random() * 6 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1,
+                    rotation: Math.random() * 360
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                var alive = false;
+                particles.forEach(function(p) {
+                    if (p.life <= 0) return;
+                    alive = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3;
+                    p.life -= 0.015;
+                    p.rotation += p.vx * 2;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                    ctx.restore();
+                });
+                if (alive) requestAnimationFrame(animate);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            requestAnimationFrame(animate);
+        }
+
         // Init
         loadPlans();
     </script>
+
+    <div class="shortcuts-overlay" id="shortcutsOverlay" onclick="if(event.target===this)hideShortcuts()">
+        <div class="shortcuts-card">
+            <h2>Keyboard Shortcuts</h2>
+            <div class="shortcut-row"><span>New plan</span><kbd>n</kbd></div>
+            <div class="shortcut-row"><span>Add step</span><kbd>s</kbd></div>
+            <div class="shortcut-row"><span>Search</span><kbd>/</kbd></div>
+            <div class="shortcut-row"><span>Navigate steps</span><kbd>j</kbd> <kbd>k</kbd></div>
+            <div class="shortcut-row"><span>Start selected</span><kbd>1</kbd></div>
+            <div class="shortcut-row"><span>Complete selected</span><kbd>2</kbd></div>
+            <div class="shortcut-row"><span>Block selected</span><kbd>3</kbd></div>
+            <div class="shortcut-row"><span>Close / Deselect</span><kbd>Esc</kbd></div>
+            <div class="shortcut-row"><span>Show shortcuts</span><kbd>?</kbd></div>
+        </div>
+    </div>
+    <div class="shortcut-hint" onclick="showShortcuts()"><kbd>?</kbd> Shortcuts</div>
+    <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:300;"></canvas>
 </body>
 </html>'''
 
