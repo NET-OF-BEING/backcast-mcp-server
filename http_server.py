@@ -493,100 +493,243 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
 
         .layout {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
             position: relative;
             z-index: 1;
+            transition: grid-template-columns 200ms ease;
         }
+        .layout.collapsed { grid-template-columns: 60px 1fr; }
 
         @media (max-width: 768px) {
             .layout { grid-template-columns: 1fr; }
-            .sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; overflow-y: auto; }
+            .sidebar { display: none; }
+            .sidebar.mobile-open { display: flex; position: fixed; inset: 0; z-index: 50; width: 280px; }
         }
 
-        /* Sidebar */
         .sidebar {
-            background: var(--surface-1);
+            background: var(--surface-0);
             border-right: 1px solid var(--border);
-            padding: 24px 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            overflow-y: auto;
+            overflow: hidden;
+            transition: all 200ms ease;
         }
 
-        .sidebar-header {
+        .sidebar-brand {
+            padding: 20px 20px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .collapsed .sidebar-brand { padding: 16px 12px; justify-content: center; }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
         }
 
-        .sidebar-title {
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+        .brand-icon svg { width: 18px; height: 18px; color: white; stroke: white; fill: none; }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+        }
+        .collapsed .brand-name { display: none; }
+
+        .collapse-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 150ms;
+            flex-shrink: 0;
+        }
+        .collapse-btn:hover { background: var(--surface-2); color: var(--text-secondary); }
+        .collapsed .collapse-btn { display: none; }
+
+        .sidebar-section {
+            padding: 16px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-label {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            padding: 0 8px;
+            margin-bottom: 8px;
         }
+        .collapsed .sidebar-label { display: none; }
 
-        .plan-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .plan-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
 
         .plan-item {
             padding: 10px 12px;
-            background: transparent;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all var(--transition);
-            border: 1px solid transparent;
-            font-size: 13px;
+            transition: all 150ms;
             color: var(--text-secondary);
-        }
-        .plan-item:hover {
-            background: var(--surface-2);
-            color: var(--text-primary);
-        }
-        .plan-item.active {
-            background: var(--surface-2);
-            border-color: var(--border-hover);
-            color: var(--text-primary);
-        }
-
-        /* Main content */
-        .main {
-            padding: 32px;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-
-        /* Header */
-        .page-header {
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 32px;
+            gap: 8px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
         }
-
-        .page-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-            color: var(--text-primary);
+        .plan-item:hover { background: var(--surface-2); color: var(--text-primary); }
+        .plan-item.active {
+            background: var(--accent-subtle);
+            color: var(--accent-light);
+            font-weight: 500;
         }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        .plan-item .plan-dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
+            background: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .plan-item.active .plan-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+        .plan-item .plan-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .collapsed .plan-name { display: none; }
+        .collapsed .plan-item { justify-content: center; padding: 10px 0; }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
             flex-shrink: 0;
         }
 
-        .status-label {
-            font-size: 11px;
+        .new-plan-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--border-hover);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 150ms;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .new-plan-btn:hover { border-color: var(--accent); color: var(--accent-light); background: var(--accent-subtle); }
+        .collapsed .new-plan-btn span { display: none; }
+
+        /* Main area */
+        .main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-header {
+            padding: 12px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-0);
+            flex-shrink: 0;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 16px; }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-1);
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 13px;
+            min-width: 220px;
+            cursor: text;
+            transition: all 150ms;
+        }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .search-box input {
+            border: none;
+            background: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            flex: 1;
+            min-width: 0;
+        }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box kbd {
+            font-size: 11px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+        .search-box svg { flex-shrink: 0; color: var(--text-muted); }
+
+        .header-right { display: flex; align-items: center; gap: 6px; }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 150ms;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        .icon-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+        .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
         }
 
         /* Section headings */
@@ -1030,32 +1173,54 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="layout">
-        <aside class="sidebar">
-            <div class="page-header" style="margin-bottom:0;">
-                <h1 style="font-size:16px;">Backcasting</h1>
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <div class="status-dot"></div>
-                    <span class="status-label" id="connectionStatus">Live</span>
+    <div class="layout" id="appLayout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-mark">
+                    <div class="brand-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <span class="brand-name">Backcasting</span>
                 </div>
+                <button class="collapse-btn" onclick="toggleSidebar()" aria-label="Collapse sidebar">&#9665;</button>
             </div>
-
-            <div class="sidebar-header">
-                <span class="sidebar-title">Plans</span>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Plans</div>
+                <ul class="plan-list" id="planList">
+                    <li style="padding:16px;color:var(--text-muted);">Loading plans...</li>
+                </ul>
             </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="showCreateModal()">+ New Plan</button>
-            <ul class="plan-list" id="planList">
-                <li class="empty-state" style="padding:16px;">Loading plans...</li>
-            </ul>
+            <div class="sidebar-footer">
+                <button class="new-plan-btn" onclick="showCreateModal()">+<span> New Plan</span></button>
+            </div>
         </aside>
 
-        <main class="main">
-            <div id="noPlanSelected" class="empty-state">
-                <h2>Select or create a plan</h2>
-                <p>Choose a plan from the sidebar to get started</p>
-            </div>
+        <div class="main">
+            <header class="main-header">
+                <div class="header-left">
+                    <div class="search-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="searchInput" placeholder="Search steps..." aria-label="Search steps">
+                        <kbd>/</kbd>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+                        <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    </button>
+                    <button class="icon-btn" onclick="showShortcuts()" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"/></svg>
+                    </button>
+                </div>
+            </header>
 
-            <div id="planDetails" style="display:none;">
+            <div class="main-scroll">
+                <div id="noPlanSelected" class="empty-state">
+                    <h2>Select or create a plan</h2>
+                    <p>Choose a plan from the sidebar to get started</p>
+                </div>
+
+                <div id="planDetails" style="display:none;">
                 <h2 id="planTitle">Plan Title</h2>
                 <p id="planDescription"></p>
 
