@@ -752,88 +752,100 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             background: var(--border);
         }
 
-        /* Plan title area */
-        #planTitle {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        #planDescription {
-            color: var(--text-secondary);
-            font-size: 13px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        /* Progress bar */
-        .progress-bar {
-            background: var(--surface-2);
-            border-radius: 999px;
-            height: 10px;
-            overflow: hidden;
-            margin: 8px 0 20px;
-            border: 1px solid var(--border);
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 16px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-
-        /* Stats grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin: 0 0 24px;
-        }
-
-        .stat-card {
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            padding: 16px;
-            border: 1px solid var(--border);
-            transition: border-color var(--transition);
-        }
-        .stat-card:hover {
-            border-color: var(--border-hover);
-        }
-
-        .stat-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .stat-indicator.complete { background: var(--success); }
-        .stat-indicator.progress { background: var(--accent); }
-        .stat-indicator.blocked { background: var(--error); }
-        .stat-indicator.todo { background: var(--text-muted); }
-        .stat-indicator.percent { background: var(--accent-hover); }
-
-        .stat-value {
-            font-size: 24px;
+        /* Plan header */
+        .plan-header { margin-bottom: 28px; }
+        .plan-header h2 {
+            font-size: 26px;
             font-weight: 700;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
             color: var(--text-primary);
-            line-height: 1;
-            margin-bottom: 4px;
         }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+        .plan-meta {
             display: flex;
             align-items: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .plan-meta .sep { color: var(--text-muted); }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .progress-ring-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            min-width: 280px;
+            flex-shrink: 0;
+        }
+
+        .ring-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .ring-svg { width: 100px; height: 100px; transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: var(--surface-3); stroke-width: 8; }
+        .ring-progress {
+            fill: none;
+            stroke: url(#ringGradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 800ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ring-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ring-value { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+        .ring-subtitle { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+        .ring-details { display: flex; flex-direction: column; gap: 10px; }
+        .ring-detail { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+        .ring-detail .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .ring-detail .count { font-weight: 600; color: var(--text-primary); margin-left: auto; min-width: 20px; text-align: right; }
+
+        .mini-stats { display: flex; flex: 1; gap: 12px; }
+
+        .mini-stat {
+            flex: 1;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .mini-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .mini-stat.stat-next::before { background: var(--success); }
+        .mini-stat.stat-blocked::before { background: var(--error); }
+        .mini-stat.stat-timeline::before { background: var(--warning); }
+
+        .mini-stat-value { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .mini-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+        @media (max-width: 900px) {
+            .stats-row { flex-direction: column; }
+            .mini-stats { flex-direction: row; }
         }
 
         /* Buttons */
@@ -1221,33 +1233,49 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                 </div>
 
                 <div id="planDetails" style="display:none;">
-                <h2 id="planTitle">Plan Title</h2>
-                <p id="planDescription"></p>
-
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressBar" style="width:0%"></div>
+                <div class="plan-header">
+                    <h2 id="planTitle"></h2>
+                    <div class="plan-meta" id="planMeta"></div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="statPercent">0%</div>
-                        <div class="stat-label"><span class="stat-indicator percent"></span>Complete</div>
+                <div class="stats-row">
+                    <div class="progress-ring-card">
+                        <div class="ring-container">
+                            <svg class="ring-svg" viewBox="0 0 100 100">
+                                <defs>
+                                    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#7c5cfc"/>
+                                        <stop offset="100%" stop-color="#34d399"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                                <circle class="ring-progress" id="ringProgress" cx="50" cy="50" r="40"/>
+                            </svg>
+                            <div class="ring-label">
+                                <span class="ring-value" id="ringPercent">0%</span>
+                                <span class="ring-subtitle">Done</span>
+                            </div>
+                        </div>
+                        <div class="ring-details">
+                            <div class="ring-detail"><span class="dot" style="background:var(--success)"></span>Completed<span class="count" id="statDone">0</span></div>
+                            <div class="ring-detail"><span class="dot" style="background:var(--accent)"></span>In Progress<span class="count" id="statProgress">0</span></div>
+                            <div class="ring-detail"><span class="dot" style="background:var(--error)"></span>Blocked<span class="count" id="statBlocked">0</span></div>
+                            <div class="ring-detail"><span class="dot" style="background:var(--text-muted)"></span>To Do<span class="count" id="statTodo">0</span></div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statDone">0</div>
-                        <div class="stat-label"><span class="stat-indicator complete"></span>Done</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statProgress">0</div>
-                        <div class="stat-label"><span class="stat-indicator progress"></span>In Progress</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statBlocked">0</div>
-                        <div class="stat-label"><span class="stat-indicator blocked"></span>Blocked</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statTodo">0</div>
-                        <div class="stat-label"><span class="stat-indicator todo"></span>To Do</div>
+                    <div class="mini-stats">
+                        <div class="mini-stat stat-next">
+                            <div class="mini-stat-value" id="statNextActions">0</div>
+                            <div class="mini-stat-label">Next Actions</div>
+                        </div>
+                        <div class="mini-stat stat-blocked">
+                            <div class="mini-stat-value" id="statBlockedCount">0</div>
+                            <div class="mini-stat-label">Blocked</div>
+                        </div>
+                        <div class="mini-stat stat-timeline">
+                            <div class="mini-stat-value" id="statTimeline">&mdash;</div>
+                            <div class="mini-stat-label">Timeline</div>
+                        </div>
                     </div>
                 </div>
 
@@ -1390,16 +1418,29 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             document.getElementById('noPlanSelected').style.display = 'none';
             document.getElementById('planDetails').style.display = 'block';
 
-            document.getElementById('planTitle').textContent = overview.outcome.title;
-            document.getElementById('planDescription').textContent = overview.outcome.description;
-
             const p = overview.progress;
-            document.getElementById('progressBar').style.width = p.percent + '%';
-            document.getElementById('statPercent').textContent = p.percent + '%';
+            document.getElementById('planTitle').textContent = overview.outcome.title;
+            document.getElementById('planMeta').innerHTML =
+                '<span>' + overview.total_steps + ' steps</span>' +
+                '<span class="sep">&middot;</span>' +
+                '<span>' + (overview.outcome.timeline || 'No timeline') + '</span>' +
+                '<span class="sep">&middot;</span>' +
+                '<span style="color:var(--success)">' + p.percent + '% complete</span>';
+
+            // Progress ring
+            const circumference = 251.2;
+            const offset = circumference - (circumference * p.percent / 100);
+            document.getElementById('ringProgress').style.strokeDashoffset = offset;
+            document.getElementById('ringPercent').textContent = p.percent + '%';
             document.getElementById('statDone').textContent = p.completed;
             document.getElementById('statProgress').textContent = p.in_progress;
             document.getElementById('statBlocked').textContent = p.blocked;
             document.getElementById('statTodo').textContent = p.not_started;
+
+            // Mini stats
+            document.getElementById('statNextActions').textContent = nextActions.next_actions ? nextActions.next_actions.length : 0;
+            document.getElementById('statBlockedCount').textContent = p.blocked;
+            document.getElementById('statTimeline').textContent = overview.outcome.timeline || '\u2014';
 
             // Next actions
             if (nextActions.next_actions && nextActions.next_actions.length > 0) {
