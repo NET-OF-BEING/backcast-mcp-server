@@ -133,7 +133,16 @@ def get_all_steps():
                 'description': step.description,
                 'dependencies': step.dependencies,
                 'duration': step.estimated_duration,
-                'success_criteria': step.success_criteria
+                'success_criteria': step.success_criteria,
+                'resources_needed': [
+                    {'name': r.name, 'type': r.type, 'amount': r.amount}
+                    for r in step.resources_needed
+                ] if step.resources_needed else [],
+                'risks': [
+                    {'description': r.description, 'probability': r.probability, 'impact': r.impact, 'mitigation': r.mitigation}
+                    for r in step.risks
+                ] if step.risks else [],
+                'notes': step.notes
             })
 
         steps.append(step_data)
@@ -248,6 +257,32 @@ def update_step_status(step_id):
         'status': 'success',
         'message': f'Step {step_id} updated to {status.value}'
     })
+
+
+@app.route('/api/plan/reorder', methods=['PUT'])
+def reorder_step():
+    """Reorder a step to a new position"""
+    global current_plan
+    if not current_plan:
+        return jsonify({'status': 'error', 'message': 'No plan loaded'}), 400
+
+    data = request.json
+    step_id = data['step_id']
+    new_position = data['new_position']
+
+    step = None
+    for i, s in enumerate(current_plan.steps):
+        if s.id == step_id:
+            step = current_plan.steps.pop(i)
+            break
+
+    if not step:
+        return jsonify({'status': 'error', 'message': 'Step not found'}), 404
+
+    new_position = max(0, min(new_position, len(current_plan.steps)))
+    current_plan.steps.insert(new_position, step)
+
+    return jsonify({'status': 'success', 'message': f'Step {step_id} moved to position {new_position}'})
 
 
 @app.route('/api/plan/analyze', methods=['GET'])
@@ -1070,6 +1105,51 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
         }
         .btn-primary:hover { background: var(--accent-light); }
 
+        .step-expanded {
+            background: var(--surface-1);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 6px;
+            box-shadow: 0 0 0 1px var(--accent-subtle), 0 8px 24px rgba(0,0,0,0.2);
+            animation: expandIn 200ms ease;
+        }
+        @keyframes expandIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .step-expanded-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step-expanded-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 600px) { .step-expanded-grid { grid-template-columns: 1fr; } }
+
+        .detail-section h4 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .detail-section p, .detail-section li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .detail-section ul { list-style: none; padding: 0; margin: 0; }
+        .detail-section li { padding: 2px 0; }
+        .detail-section li::before { content: '\\2192  '; color: var(--accent); }
+        .detail-empty { color: var(--text-muted); font-style: italic; font-size: 12px; }
+
         /* Modals */
         .modal {
             display: none;
@@ -1557,7 +1637,7 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             stepList.innerHTML = filtered.map(s => {
                 const ringClass = s.status !== 'not_started' ? s.status : '';
                 const ringContent = s.status === 'completed' ? '&#10003;' : s.status === 'blocked' ? '!' : '';
-                return '<div class="step-card ' + s.status + '" data-step-id="' + s.id + '">' +
+                var card = '<div class="step-card ' + s.status + '" data-step-id="' + s.id + '" draggable="true" ondragstart="onDragStart(event,' + s.id + ')" ondragover="onDragOver(event)" ondrop="onDrop(event,' + s.id + ')" ondragend="onDragEnd(event)" onclick="toggleExpand(' + s.id + ', event)">' +
                     '<div class="step-drag"><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div></div>' +
                     '<div class="step-ring ' + ringClass + '" onclick="cycleStatus(' + s.id + ', \'' + s.status + '\', event)" title="Click to change status">' + ringContent + '</div>' +
                     '<div class="step-body">' +
@@ -1571,6 +1651,35 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                         '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'blocked\'); event.stopPropagation();" title="Block" aria-label="Block step ' + s.id + '">&#9888;</button>' +
                     '</div>' +
                 '</div>';
+                var expanded = '';
+                if (expandedStepId === s.id) {
+                    expanded = '<div class="step-expanded">' +
+                        '<div class="step-expanded-header">' +
+                            '<div class="step-ring ' + ringClass + '">' + ringContent + '</div>' +
+                            '<div style="flex:1"><div class="step-card-title">#' + s.id + ' ' + s.title + '</div></div>' +
+                            '<span class="step-priority ' + s.priority + '">' + s.priority + '</span>' +
+                        '</div>' +
+                        '<div class="step-expanded-grid">' +
+                            '<div class="detail-section"><h4>Description</h4><p>' + (s.description || '<span class="detail-empty">No description</span>') + '</p></div>' +
+                            '<div class="detail-section"><h4>Dependencies</h4>' +
+                                (s.dependencies && s.dependencies.length > 0
+                                    ? '<ul>' + s.dependencies.map(function(d) { return '<li>Step #' + d + '</li>'; }).join('') + '</ul>'
+                                    : '<span class="detail-empty">None</span>') +
+                            '</div>' +
+                            '<div class="detail-section"><h4>Resources</h4>' +
+                                (s.resources_needed && s.resources_needed.length > 0
+                                    ? '<ul>' + s.resources_needed.map(function(r) { return '<li>' + r.name + (r.amount ? ' (' + r.amount + ')' : '') + '</li>'; }).join('') + '</ul>'
+                                    : '<span class="detail-empty">None listed</span>') +
+                            '</div>' +
+                            '<div class="detail-section"><h4>Risks</h4>' +
+                                (s.risks && s.risks.length > 0
+                                    ? '<ul>' + s.risks.map(function(r) { return '<li>' + r.description + '</li>'; }).join('') + '</ul>'
+                                    : '<span class="detail-empty">None identified</span>') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
+                return card + expanded;
             }).join('');
         }
 
@@ -1586,6 +1695,57 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             event.stopPropagation();
             var cycle = { not_started: 'in_progress', in_progress: 'completed', completed: 'not_started', blocked: 'in_progress' };
             updateStatus(stepId, cycle[current] || 'in_progress');
+        }
+
+        function toggleExpand(stepId, event) {
+            if (event.target.closest('.step-hover-actions') || event.target.closest('.step-ring') || event.target.closest('.step-drag')) return;
+            if (expandedStepId === stepId) {
+                expandedStepId = null;
+            } else {
+                expandedStepId = stepId;
+            }
+            if (window._allSteps) renderSteps(window._allSteps);
+        }
+
+        var draggedStepId = null;
+
+        function onDragStart(e, stepId) {
+            draggedStepId = stepId;
+            e.dataTransfer.effectAllowed = 'move';
+            e.target.style.opacity = '0.4';
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            var card = e.target.closest('.step-card');
+            if (card) {
+                document.querySelectorAll('.step-card').forEach(function(c) { c.style.borderTopColor = ''; });
+                card.style.borderTopColor = 'var(--accent)';
+            }
+        }
+
+        function onDrop(e, targetStepId) {
+            e.preventDefault();
+            document.querySelectorAll('.step-card').forEach(function(c) { c.style.borderTopColor = ''; c.style.opacity = ''; });
+            if (draggedStepId === null || draggedStepId === targetStepId) return;
+
+            var targetIndex = window._allSteps.findIndex(function(s) { return s.id === targetStepId; });
+            api('/api/plan/reorder', {
+                method: 'PUT',
+                body: JSON.stringify({ step_id: draggedStepId, new_position: targetIndex })
+            }).then(function() {
+                return api('/api/plan/save', { method: 'POST', body: JSON.stringify({ filename: currentPlan }) });
+            }).then(function() {
+                refreshPlanView();
+            });
+            draggedStepId = null;
+        }
+
+        function onDragEnd(e) {
+            e.target.style.opacity = '';
+            document.querySelectorAll('.step-card').forEach(function(c) { c.style.borderTopColor = ''; });
+            draggedStepId = null;
         }
 
         function showExportMenu(e) {
