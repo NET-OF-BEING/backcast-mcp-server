@@ -1316,16 +1316,15 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            border-radius: 999px;
-            color: white;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
             font-weight: 500;
             font-size: 13px;
             z-index: 200;
-            animation: toastIn 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            animation: toastIn 200ms ease;
             box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
         }
         .toast::before {
             content: '';
@@ -1340,26 +1339,28 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
         .toast-error::before { background: var(--error); box-shadow: 0 0 6px var(--error); }
 
         @keyframes toastIn {
-            from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+            from { transform: translateX(-50%) translateY(12px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
         /* Empty states */
         .empty-state {
             text-align: center;
-            padding: 48px 24px;
+            padding: 64px 24px;
             color: var(--text-muted);
         }
         .empty-state h2 {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 600;
             color: var(--text-secondary);
             margin-bottom: 8px;
             letter-spacing: -0.02em;
         }
         .empty-state p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
+            max-width: 300px;
+            margin: 0 auto;
         }
 
         /* Next actions callout */
@@ -1397,11 +1398,31 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             border-bottom: 1px solid rgba(52,211,153,0.08);
         }
         .next-actions li:last-child { border-bottom: none; }
+
+        /* Focus rings */
+        .plan-item:focus-visible,
+        .new-plan-btn:focus-visible,
+        .collapse-btn:focus-visible,
+        .action-btn:focus-visible,
+        .filter-pill:focus-visible,
+        .modal-close:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .ring-progress { transition: none !important; }
+        }
     </style>
 </head>
 <body>
     <div class="layout" id="appLayout">
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" role="navigation">
             <div class="sidebar-brand">
                 <div class="brand-mark">
                     <div class="brand-icon">
@@ -1413,7 +1434,7 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             </div>
             <div class="sidebar-section">
                 <div class="sidebar-label">Plans</div>
-                <ul class="plan-list" id="planList">
+                <ul class="plan-list" id="planList" aria-label="Plan list">
                     <li style="padding:16px;color:var(--text-muted);">Loading plans...</li>
                 </ul>
             </div>
@@ -1441,7 +1462,7 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                 </div>
             </header>
 
-            <div class="main-scroll">
+            <div class="main-scroll" role="main">
                 <div id="noPlanSelected" class="empty-state">
                     <h2>Select or create a plan</h2>
                     <p>Choose a plan from the sidebar to get started</p>
