@@ -410,126 +410,699 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backcasting Dashboard</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); min-height: 100vh; color: #e2e8f0; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #4c1d95; margin-bottom: 1.5rem; }
-        h1 { color: #c4b5fd; font-size: 1.5rem; }
-        .status-badge { background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; }
-        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-        .sidebar { background: rgba(30, 27, 75, 0.8); border-radius: 12px; padding: 1rem; }
-        .main { background: rgba(30, 27, 75, 0.6); border-radius: 12px; padding: 1.5rem; }
-        h2 { color: #a5b4fc; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .plan-list { list-style: none; }
-        .plan-item { padding: 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-        .plan-item:hover { border-color: #7c3aed; background: rgba(139, 92, 246, 0.3); }
-        .plan-item.active { border-color: #a855f7; background: rgba(139, 92, 246, 0.4); }
-        .btn { padding: 0.5rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-        .btn-primary { background: #7c3aed; color: white; }
-        .btn-primary:hover { background: #6d28d9; }
-        .btn-secondary { background: rgba(139, 92, 246, 0.3); color: #c4b5fd; border: 1px solid #7c3aed; }
-        .btn-secondary:hover { background: rgba(139, 92, 246, 0.5); }
-        .btn-success { background: #10b981; color: white; }
-        .btn-success:hover { background: #059669; }
-        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
-        .progress-bar { background: #1e1b4b; border-radius: 999px; height: 8px; overflow: hidden; margin: 0.5rem 0; }
-        .progress-fill { background: linear-gradient(90deg, #7c3aed, #a855f7); height: 100%; border-radius: 999px; transition: width 0.3s; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
-        .stat-card { background: rgba(139, 92, 246, 0.15); border-radius: 8px; padding: 0.75rem; text-align: center; }
-        .stat-value { font-size: 1.5rem; font-weight: bold; color: #a5b4fc; }
-        .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; }
-        .step-list { max-height: 400px; overflow-y: auto; }
-        .step-item { background: rgba(30, 27, 75, 0.8); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid #6b7280; }
-        .step-item.completed { border-left-color: #10b981; opacity: 0.7; }
-        .step-item.in_progress { border-left-color: #3b82f6; }
-        .step-item.blocked { border-left-color: #ef4444; }
-        .step-header { display: flex; justify-content: space-between; align-items: start; gap: 0.5rem; }
-        .step-title { font-weight: 500; flex: 1; }
-        .step-badge { padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 500; }
-        .badge-critical { background: #dc2626; color: white; }
-        .badge-high { background: #f97316; color: white; }
-        .badge-medium { background: #eab308; color: black; }
-        .badge-low { background: #22c55e; color: white; }
-        .step-desc { font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; }
-        .step-actions { margin-top: 0.5rem; display: flex; gap: 0.25rem; }
-        .step-actions button { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #08080c;
+            --surface-0: #0c0c14;
+            --surface-1: #111119;
+            --surface-2: #181824;
+            --surface-3: #222233;
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --accent: #7c5cfc;
+            --accent-light: #9b7dff;
+            --accent-glow: rgba(124,92,252,0.2);
+            --accent-subtle: rgba(124,92,252,0.08);
+            --success: #34d399;
+            --success-subtle: rgba(52,211,153,0.08);
+            --warning: #fbbf24;
+            --error: #f87171;
+            --text-primary: #eaeaf0;
+            --text-secondary: #8888a0;
+            --text-muted: #50506a;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 150ms ease;
+        }
+
+        [data-theme="light"] {
+            --bg: #f8f8fc;
+            --surface-0: #ffffff;
+            --surface-1: #ffffff;
+            --surface-2: #f0f0f6;
+            --surface-3: #e8e8f0;
+            --border: rgba(0,0,0,0.08);
+            --border-hover: rgba(0,0,0,0.15);
+            --accent: #6b4ce6;
+            --accent-light: #8b6cf0;
+            --accent-glow: rgba(107,76,230,0.15);
+            --accent-subtle: rgba(107,76,230,0.06);
+            --success: #22b47f;
+            --success-subtle: rgba(34,180,127,0.08);
+            --warning: #d4960c;
+            --error: #e04545;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b6b80;
+            --text-muted: #9898ac;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(124,92,252,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        [data-theme="light"] body::before {
+            background: radial-gradient(ellipse, rgba(107,76,230,0.04) 0%, transparent 70%);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; overflow-y: auto; }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface-1);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .plan-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+        .plan-item {
+            padding: 10px 12px;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            border: 1px solid transparent;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .plan-item:hover {
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+        .plan-item.active {
+            background: var(--surface-2);
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        /* Main content */
+        .main {
+            padding: 32px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            flex-shrink: 0;
+        }
+
+        .status-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Section headings */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Plan title area */
+        #planTitle {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        #planDescription {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            background: var(--surface-2);
+            border-radius: 999px;
+            height: 10px;
+            overflow: hidden;
+            margin: 8px 0 20px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 16px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 0 0 24px;
+        }
+
+        .stat-card {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: border-color var(--transition);
+        }
+        .stat-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .stat-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .stat-indicator.complete { background: var(--success); }
+        .stat-indicator.progress { background: var(--accent); }
+        .stat-indicator.blocked { background: var(--error); }
+        .stat-indicator.todo { background: var(--text-muted); }
+        .stat-indicator.percent { background: var(--accent-hover); }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1;
+            font-family: inherit;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 2px 8px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--surface-3);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .btn-success {
+            background: rgba(52,211,153,0.15);
+            color: var(--success);
+            border: 1px solid rgba(52,211,153,0.25);
+        }
+        .btn-success:hover {
+            background: rgba(52,211,153,0.25);
+        }
+
+        .btn-accent {
+            background: rgba(139,92,246,0.15);
+            color: var(--accent);
+            border: 1px solid rgba(139,92,246,0.25);
+        }
+        .btn-accent:hover {
+            background: rgba(139,92,246,0.25);
+        }
+
+        .btn-error {
+            background: rgba(248,113,113,0.15);
+            color: var(--error);
+            border: 1px solid rgba(248,113,113,0.25);
+        }
+        .btn-error:hover {
+            background: rgba(248,113,113,0.25);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #8a8a9f;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        .btn-ghost:hover {
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 24px; }
+
+        /* Step cards */
+        .step-list {
+            max-height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .step-item {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--text-muted);
+            transition: all var(--transition);
+        }
+        .step-item:hover {
+            border-color: var(--border-hover);
+            border-left-color: inherit;
+            background: rgba(26,26,46,0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .step-item.completed {
+            border-left-color: var(--success);
+        }
+        .step-item.completed .step-header,
+        .step-item.completed .step-desc {
+            opacity: 0.6;
+        }
+        .step-item.completed:hover .step-header,
+        .step-item.completed:hover .step-desc {
+            opacity: 0.8;
+        }
+        .step-item.in_progress { border-left-color: var(--accent); }
+        .step-item.blocked { border-left-color: var(--error); }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-title {
+            font-weight: 500;
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .step-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            flex-shrink: 0;
+        }
+        .badge-critical { background: rgba(248,113,113,0.15); color: var(--error); }
+        .badge-high { background: rgba(251,191,36,0.15); color: var(--warning); }
+        .badge-medium { background: rgba(124,92,252,0.15); color: var(--accent-hover); }
+        .badge-low { background: rgba(107,107,128,0.15); color: var(--text-secondary); }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .step-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+        }
+        .step-actions button {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
         .modal.active { display: flex; }
-        .modal-content { background: #1e1b4b; border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.25rem; color: #a5b4fc; font-size: 0.85rem; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid #4c1d95; background: rgba(30, 27, 75, 0.8); color: #e2e8f0; }
+
+        .modal-content {
+            background: var(--surface-1);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .modal-close:hover { background: var(--surface-2); color: var(--text-primary); }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            transition: all var(--transition);
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
         .form-group textarea { min-height: 80px; resize: vertical; }
-        .toast { position: fixed; bottom: 1rem; right: 1rem; padding: 0.75rem 1rem; border-radius: 8px; color: white; font-weight: 500; z-index: 200; animation: slideIn 0.3s; }
-        .toast-success { background: #10b981; }
-        .toast-error { background: #ef4444; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
-        .next-actions { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-        .next-actions h3 { color: #10b981; font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .next-actions ul { list-style: none; font-size: 0.85rem; }
-        .next-actions li { padding: 0.25rem 0; }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder { color: var(--text-muted); }
+
+        /* Toasts */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 999px;
+            color: white;
+            font-weight: 500;
+            font-size: 13px;
+            z-index: 200;
+            animation: toastIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .toast::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .toast-success { background: var(--surface-2); border: 1px solid rgba(52,211,153,0.3); }
+        .toast-success::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
+        .toast-error { background: var(--surface-2); border: 1px solid rgba(248,113,113,0.3); }
+        .toast-error::before { background: var(--error); box-shadow: 0 0 6px var(--error); }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Empty states */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+        .empty-state h2 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        .empty-state p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Next actions callout */
+        .next-actions {
+            background: rgba(52,211,153,0.06);
+            border: 1px solid rgba(52,211,153,0.15);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+        .next-actions h3 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--success);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .next-actions h3::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+        .next-actions ul { list-style: none; }
+        .next-actions li {
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(52,211,153,0.08);
+        }
+        .next-actions li:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎯 Outcome Backcasting</h1>
-            <span class="status-badge" id="connectionStatus">Connected</span>
-        </header>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="page-header" style="margin-bottom:0;">
+                <h1 style="font-size:16px;">Backcasting</h1>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="status-dot"></div>
+                    <span class="status-label" id="connectionStatus">Live</span>
+                </div>
+            </div>
 
-        <div class="grid">
-            <aside class="sidebar">
-                <h2>📁 Plans</h2>
-                <button class="btn btn-primary" style="width:100%; margin-bottom:1rem;" onclick="showCreateModal()">+ New Plan</button>
-                <ul class="plan-list" id="planList">
-                    <li class="empty-state">Loading plans...</li>
-                </ul>
-            </aside>
+            <div class="sidebar-header">
+                <span class="sidebar-title">Plans</span>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="showCreateModal()">+ New Plan</button>
+            <ul class="plan-list" id="planList">
+                <li class="empty-state" style="padding:16px;">Loading plans...</li>
+            </ul>
+        </aside>
 
-            <main class="main">
-                <div id="noPlanSelected" class="empty-state">
-                    <h2>Select or create a plan</h2>
-                    <p>Choose a plan from the sidebar or create a new one</p>
+        <main class="main">
+            <div id="noPlanSelected" class="empty-state">
+                <h2>Select or create a plan</h2>
+                <p>Choose a plan from the sidebar to get started</p>
+            </div>
+
+            <div id="planDetails" style="display:none;">
+                <h2 id="planTitle">Plan Title</h2>
+                <p id="planDescription"></p>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width:0%"></div>
                 </div>
 
-                <div id="planDetails" style="display:none;">
-                    <h2 id="planTitle">Plan Title</h2>
-                    <p id="planDescription" style="color:#94a3b8; margin-bottom:1rem;"></p>
-
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar" style="width:0%"></div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPercent">0%</div>
+                        <div class="stat-label"><span class="stat-indicator percent"></span>Complete</div>
                     </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-value" id="statPercent">0%</div><div class="stat-label">Complete</div></div>
-                        <div class="stat-card"><div class="stat-value" id="statDone">0</div><div class="stat-label">Done</div></div>
-                        <div class="stat-card"><div class="stat-value" id="statProgress">0</div><div class="stat-label">In Progress</div></div>
-                        <div class="stat-card"><div class="stat-value" id="statBlocked">0</div><div class="stat-label">Blocked</div></div>
-                        <div class="stat-card"><div class="stat-value" id="statTodo">0</div><div class="stat-label">To Do</div></div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDone">0</div>
+                        <div class="stat-label"><span class="stat-indicator complete"></span>Done</div>
                     </div>
-
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="generateAISteps()">🤖 AI Generate Steps</button>
-                        <button class="btn btn-secondary" onclick="exportPDF()">📄 PDF</button>
-                        <button class="btn btn-secondary" onclick="exportHTML()">🌐 HTML</button>
-                        <button class="btn btn-secondary" onclick="exportICal()">📅 iCal</button>
-                        <button class="btn btn-success" onclick="showAddStepModal()">+ Add Step</button>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statProgress">0</div>
+                        <div class="stat-label"><span class="stat-indicator progress"></span>In Progress</div>
                     </div>
-
-                    <div class="next-actions" id="nextActions" style="display:none;">
-                        <h3>🎯 Next Actions</h3>
-                        <ul id="nextActionsList"></ul>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statBlocked">0</div>
+                        <div class="stat-label"><span class="stat-indicator blocked"></span>Blocked</div>
                     </div>
-
-                    <h2>📝 Steps</h2>
-                    <div class="step-list" id="stepList"></div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTodo">0</div>
+                        <div class="stat-label"><span class="stat-indicator todo"></span>To Do</div>
+                    </div>
                 </div>
-            </main>
-        </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateAISteps()">AI Generate Steps</button>
+                    <button class="btn btn-secondary" onclick="exportPDF()">PDF</button>
+                    <button class="btn btn-secondary" onclick="exportHTML()">HTML</button>
+                    <button class="btn btn-secondary" onclick="exportICal()">iCal</button>
+                    <button class="btn btn-success" onclick="showAddStepModal()">+ Add Step</button>
+                </div>
+
+                <div class="next-actions" id="nextActions" style="display:none;">
+                    <h3>Next Actions</h3>
+                    <ul id="nextActionsList"></ul>
+                </div>
+
+                <div class="section-label">Steps</div>
+                <div class="step-list" id="stepList"></div>
+            </div>
+        </main>
     </div>
 
     <!-- Create Plan Modal -->
@@ -630,7 +1203,7 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                     `<li class="plan-item" onclick="loadPlan('${p}')">${p.replace('.json','')}</li>`
                 ).join('');
             } else {
-                list.innerHTML = '<li class="empty-state">No plans yet</li>';
+                list.innerHTML = '<li class="empty-state" style="padding:16px;">No plans yet</li>';
             }
         }
 
@@ -667,7 +1240,7 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
             if (nextActions.next_actions && nextActions.next_actions.length > 0) {
                 document.getElementById('nextActions').style.display = 'block';
                 document.getElementById('nextActionsList').innerHTML = nextActions.next_actions.slice(0,3).map(a =>
-                    `<li><strong>${a.title}</strong> (${a.priority})</li>`
+                    `<li><strong>${a.title}</strong> <span style="color:var(--text-muted)">${a.priority}</span></li>`
                 ).join('');
             } else {
                 document.getElementById('nextActions').style.display = 'none';
@@ -684,14 +1257,14 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                         </div>
                         <div class="step-desc">${s.description || 'No description'}</div>
                         <div class="step-actions">
-                            <button class="btn btn-secondary" onclick="updateStatus(${s.id}, 'in_progress')">▶️ Start</button>
-                            <button class="btn btn-success" onclick="updateStatus(${s.id}, 'completed')">✓ Done</button>
-                            <button class="btn btn-secondary" onclick="updateStatus(${s.id}, 'blocked')">🚫 Block</button>
+                            <button class="btn ${s.status === 'in_progress' ? 'btn-accent' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'in_progress')">Start</button>
+                            <button class="btn ${s.status === 'completed' ? 'btn-success' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'completed')">Done</button>
+                            <button class="btn ${s.status === 'blocked' ? 'btn-error' : 'btn-ghost'}" onclick="updateStatus(${s.id}, 'blocked')">Block</button>
                         </div>
                     </div>
                 `).join('');
             } else {
-                stepList.innerHTML = '<div class="empty-state">No steps yet. Click "AI Generate Steps" to create some!</div>';
+                stepList.innerHTML = '<div class="empty-state">No steps yet. Click "AI Generate Steps" to create some.</div>';
             }
         }
 
