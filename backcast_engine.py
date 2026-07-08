@@ -519,7 +519,7 @@ IMPORTANT:
             raise ImportError("reportlab is required for PDF export. Install with: pip install reportlab")
 
         if filename is None:
-            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')
+            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')[:80].rstrip('_') or "plan"
             filename = f"{safe_title}.pdf"
 
         filepath = os.path.join(self.data_dir, filename)
@@ -611,7 +611,7 @@ IMPORTANT:
             raise ImportError("icalendar is required for iCal export. Install with: pip install icalendar")
 
         if filename is None:
-            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')
+            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')[:80].rstrip('_') or "plan"
             filename = f"{safe_title}.ics"
 
         if start_date is None:
@@ -656,7 +656,7 @@ IMPORTANT:
     def export_to_html(self, plan: BackcastPlan, filename: str = None) -> str:
         """Export plan to a styled HTML report"""
         if filename is None:
-            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')
+            safe_title = re.sub(r'[^\w\s-]', '', plan.outcome.title).strip().replace(' ', '_')[:80].rstrip('_') or "plan"
             filename = f"{safe_title}.html"
 
         filepath = os.path.join(self.data_dir, filename)
