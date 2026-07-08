@@ -25,6 +25,13 @@ data/*.json
 data/*.pdf
 data/*.ics
 data/*.html
+data/*.md
+
+# Backups
+*.bak
+
+# Superpowers scratch
+.superpowers/
 
 # Large video files
 *.mkv
