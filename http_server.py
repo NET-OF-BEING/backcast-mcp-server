@@ -1792,16 +1792,16 @@ DASHBOARD_HTML = '''<!DOCTYPE html>
                 const ringContent = s.status === 'completed' ? '&#10003;' : s.status === 'blocked' ? '!' : '';
                 var card = '<div class="step-card ' + s.status + '" data-step-id="' + s.id + '" draggable="true" ondragstart="onDragStart(event,' + s.id + ')" ondragover="onDragOver(event)" ondrop="onDrop(event,' + s.id + ')" ondragend="onDragEnd(event)" onclick="toggleExpand(' + s.id + ', event)">' +
                     '<div class="step-drag"><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div><div class="drag-row"><span class="drag-dot"></span><span class="drag-dot"></span></div></div>' +
-                    '<div class="step-ring ' + ringClass + '" onclick="cycleStatus(' + s.id + ', \'' + s.status + '\', event)" title="Click to change status">' + ringContent + '</div>' +
+                    '<div class="step-ring ' + ringClass + '" onclick="cycleStatus(' + s.id + ', \\'' + s.status + '\\', event)" title="Click to change status">' + ringContent + '</div>' +
                     '<div class="step-body">' +
                         '<div class="step-card-title">#' + s.id + ' ' + s.title + '</div>' +
                         '<div class="step-card-desc">' + (s.description || 'No description') + '</div>' +
                     '</div>' +
                     '<span class="step-priority ' + s.priority + '">' + s.priority + '</span>' +
                     '<div class="step-hover-actions">' +
-                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'in_progress\'); event.stopPropagation();" title="Start" aria-label="Start step ' + s.id + '">&#9654;</button>' +
-                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'completed\'); event.stopPropagation();" title="Done" aria-label="Complete step ' + s.id + '">&#10003;</button>' +
-                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \'blocked\'); event.stopPropagation();" title="Block" aria-label="Block step ' + s.id + '">&#9888;</button>' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \\'in_progress\\'); event.stopPropagation();" title="Start" aria-label="Start step ' + s.id + '">&#9654;</button>' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \\'completed\\'); event.stopPropagation();" title="Done" aria-label="Complete step ' + s.id + '">&#10003;</button>' +
+                        '<button class="step-action-btn" onclick="updateStatus(' + s.id + ', \\'blocked\\'); event.stopPropagation();" title="Block" aria-label="Block step ' + s.id + '">&#9888;</button>' +
                     '</div>' +
                 '</div>';
                 var expanded = '';
